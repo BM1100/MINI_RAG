@@ -1,78 +1,78 @@
-# Mini-RAG 
+# Mini-RAG
 
 A lightweight **Retrieval-Augmented Generation (RAG)** system that allows users to ask questions about documents and receive answers grounded in the retrieved content.
 
-The project demonstrates the core architecture behind modern RAG applications — from **document ingestion and chunking to semantic search and LLM-based answer generation**.
+The project demonstrates the core architecture behind modern RAG applications, from **document ingestion and chunking to semantic search and LLM-based answer generation**.
 
-##  Features
+## Features
 
-*  Upload and process documents
+* Upload and process documents
 * Split large documents into smaller chunks
-*  Generate semantic embeddings for document chunks
-*  Perform similarity-based vector search
-*  Generate context-aware answers using an LLM
-*  Retrieve relevant document sections before generating responses
-*  Lightweight architecture suitable for experimentation and learning
-*  Modular ingestion and retrieval pipeline
+* Generate semantic embeddings for document chunks
+* Perform similarity-based vector search
+* Generate context-aware answers using an LLM
+* Retrieve relevant document sections before generating responses
+* Modular ingestion and retrieval pipeline
+* Lightweight architecture suitable for experimentation and learning
 
-##  RAG Architecture
+## RAG Architecture
 
 ```text
                 DOCUMENT INGESTION
-                       │
-                       ▼
-                ┌─────────────┐
-                │   Document  │
-                │    Loader   │
-                └──────┬──────┘
-                       │
-                       ▼
-                ┌─────────────┐
-                │    Text     │
-                │   Chunking  │
-                └──────┬──────┘
-                       │
-                       ▼
-                ┌─────────────┐
-                │  Embedding  │
-                │    Model    │
-                └──────┬──────┘
-                       │
-                       ▼
-                ┌─────────────┐
-                │ Vector Store│
-                └─────────────┘
-                       ▲
-                       │
+                       |
+                       v
+                +-------------+
+                |  Document   |
+                |   Loader    |
+                +------+------+ 
+                       |
+                       v
+                +-------------+
+                |    Text     |
+                |   Chunking  |
+                +------+------+
+                       |
+                       v
+                +-------------+
+                |  Embedding  |
+                |    Model    |
+                +------+------+
+                       |
+                       v
+                +-------------+
+                | Vector Store|
+                +-------------+
+                       ^
+                       |
                  Similarity Search
-                       │
-                       │
-USER QUERY ────────────┘
-     │
-     ▼
-┌─────────────┐
-│   Query     │
-│  Embedding  │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│   Retrieve  │
-│   Relevant  │
-│   Chunks    │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│     LLM     │
-│ Generation  │
-└──────┬──────┘
-       │
-       ▼
+                       |
+                       |
+USER QUERY -----------+
+     |
+     v
++-------------+
+|    Query    |
+|  Embedding  |
++------+------+
+       |
+       v
++-------------+
+|   Retrieve  |
+|   Relevant  |
+|    Chunks   |
++------+------+
+       |
+       v
++-------------+
+|     LLM     |
+| Generation  |
++------+------+
+       |
+       v
    FINAL ANSWER
 ```
 
-##  How It Works
+## How It Works
 
 ### 1. Document Ingestion
 
@@ -82,7 +82,7 @@ Documents are loaded and converted into machine-readable text.
 
 Large documents are divided into smaller overlapping chunks.
 
-Chunking helps the retrieval system identify the most relevant sections instead of passing the entire document to the LLM.
+Chunking allows the retrieval system to identify relevant sections instead of passing the entire document to the LLM.
 
 ### 3. Embedding Generation
 
@@ -92,7 +92,7 @@ Semantically similar pieces of text are represented by vectors that are close to
 
 ### 4. Vector Storage
 
-The generated embeddings are stored in a vector database/index for efficient similarity search.
+The generated embeddings are stored in a vector index for efficient similarity search.
 
 ### 5. Query Processing
 
@@ -106,34 +106,34 @@ The system performs similarity search to retrieve the most relevant document chu
 
 The retrieved context is combined with the user's question and passed to the language model.
 
-The LLM then generates an answer based on the retrieved information.
+The LLM generates an answer based on the retrieved information.
 
-##  Tech Stack
+## Tech Stack
 
-* **Python**
-* **LLM:** Google Gemini
-* **Embeddings:** Sentence Transformers
-* **Vector Search:** FAISS
-* **Document Processing:** PyPDF
-* **RAG Pipeline:** Custom Python implementation
+* Python
+* Google Gemini
+* Sentence Transformers
+* FAISS
+* PyPDF
+* Custom Python RAG Pipeline
 
-##  Project Structure
+## Project Structure
 
 ```text
 Mini-Rag/
-│
+|
 ├── ingestion.py        # Document processing and vector creation
 ├── retrieval.py        # Query processing and similarity search
 ├── requirements.txt    # Project dependencies
 ├── README.md
-│
+|
 └── data/
     └── documents/      # Input documents
 ```
 
 > The exact file structure may vary depending on the current implementation.
 
-##  Getting Started
+## Getting Started
 
 ### 1. Clone the Repository
 
@@ -194,15 +194,114 @@ python retrieval.py
 
 You can then submit questions and retrieve answers based on the indexed documents.
 
-##  Why RAG?
+## Why RAG?
 
-Traditional LLM applications rely primarily on knowledge encoded during model training. This can lead to problems when the required information is:
+Traditional LLM applications rely primarily on knowledge encoded during model training. This can create problems when the required information is:
 
-* private
-* domain-specific
-* recently updated
-* contained in user-provided documents
+* Private
+* Domain-specific
+* Recently updated
+* Contained in user-provided documents
 
 RAG addresses this by retrieving relevant external context before generating the response.
 
-Instead
+Instead of:
+
+```text
+Question -> LLM -> Answer
+```
+
+the system uses:
+
+```text
+Question
+   |
+   v
+Retrieve relevant context
+   |
+   v
+Question + Context
+   |
+   v
+LLM
+   |
+   v
+Grounded Answer
+```
+
+## Key Design Decisions
+
+### Chunking
+
+Documents are divided into manageable pieces so retrieval can operate on specific sections rather than entire documents.
+
+### Semantic Retrieval
+
+Embeddings allow the system to retrieve text based on semantic similarity instead of relying only on exact keyword matches.
+
+### Separation of Pipelines
+
+The project separates the ingestion and retrieval processes.
+
+**Ingestion:**
+
+```text
+Documents -> Chunks -> Embeddings -> Vector Store
+```
+
+**Retrieval:**
+
+```text
+Query -> Query Embedding -> Similarity Search -> Context -> LLM
+```
+
+This allows document processing to be performed once and reused for multiple queries.
+
+## Limitations
+
+This project is intentionally lightweight and focuses on demonstrating the fundamental RAG pipeline.
+
+Potential limitations include:
+
+* Retrieval quality depends on chunking and embedding quality
+* Large document collections require more scalable storage and indexing
+* Retrieved context may occasionally be incomplete
+* LLMs can still generate incorrect information when retrieved context is insufficient
+* No advanced reranking layer is currently implemented
+
+## Future Improvements
+
+* Hybrid search using BM25 and vector search
+* Cross-encoder reranking
+* Metadata filtering
+* Query rewriting
+* Multi-query retrieval
+* Conversational memory
+* Retrieval and generation evaluation
+* Scalable vector database
+* Distributed document ingestion
+* Support for large-scale document collections
+* Streaming responses
+* Dockerized deployment
+
+## Learning Outcomes
+
+Through this project, I explored:
+
+* Retrieval-Augmented Generation
+* Vector embeddings
+* Semantic search
+* Vector databases
+* Document chunking
+* LLM prompting
+* Information retrieval
+* RAG pipeline architecture
+* Separation of ingestion and retrieval systems
+
+## Author
+
+**Bhagya Majithiya**
+
+B.Tech — Information and Communication Technology
+
+GitHub: [BM1100](https://github.com/BM1100)
