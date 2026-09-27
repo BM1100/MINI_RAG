@@ -6,68 +6,82 @@ from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
 from google import genai
 
-
-INDEX_PATH = "vector.index"
-CHUNKS_PATH = "chunks.pkl"
 load_dotenv()
 
-index = faiss.read_index(INDEX_PATH)
-
-with open(CHUNKS_PATH, "rb") as f:
-    chunks = pickle.load(f)
-print("Loaded vectors:", index.ntotal)
-print("Loaded chunks:", len(chunks))
-
-embedding_model = SentenceTransformer(
-    "all-MiniLM-L6-v2"
-)
 client = genai.Client(
     api_key=os.getenv("GEMINI_API_KEY")
 )
 
-query = input("\nAsk a question: ")
+# Load FAISS index
+index = faiss.read_index("vector.index")
 
-query_embedding = embedding_model.encode(
-    [query],
-    convert_to_numpy=True
-)
+# Load chunks
+with open("chunks.pkl", "rb") as f:
+    chunks = pickle.load(f)
 
-k = 3
-distances, indices = index.search(
-    query_embedding,
-    k
-)
+print("Knowledge base loaded.")
+print("Total chunks:", len(chunks))
 
+# Load embedding model
+print("Loading embedding model...")
+embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
-retrieved_chunks = []
+print("\nRAG is ready!")
+print("Type 'stop' or 'end' to exit.\n")
 
-for idx in indices[0]:
-    retrieved_chunks.append(chunks[idx])
+while True:
 
-context = "\n\n".join(
-    retrieved_chunks
-)
+    # User query
+    query = input("Ask a question: ").strip()
 
-prompt = f"""
-You are a document question-answering assistant.
-Answer the user's question using ONLY the provided context.
-If the answer cannot be found in the context, say:
-"I couldn't find the answer in the provided document."
+    # Exit condition
+    if query.lower() in ["stop", "end"]:
+        print("Conversation ended.")
+        break
 
-Context:
-{context}
+    if not query:
+        continue
+
+    # Convert query into embedding
+    query_embedding = embedding_model.encode(
+        [query],
+        convert_to_numpy=True
+    )
+
+    # Search FAISS
+    k = 5
+    distances, indices = index.search(
+        query_embedding,
+        k
+    )
+
+    # Get relevant chunks
+    context = ""
+
+    for idx in indices[0]:
+        chunk = chunks[idx]
+        context += chunk["text"] + "\n\n"
+
+    # Create prompt
+    prompt = f"""
+Answer the question using only the context below.
+
+If the answer is not present in the context,
+say "I don't know."
 
 Question:
 {query}
 
-Answer:
+Context:
+{context}
 """
 
-response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents=prompt
-)
+    # Generate answer
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt
+    )
 
-
-print("\n========== ANSWER ==========")
-print(response.text)
+    print("\nAnswer:")
+    print(response.text)
+    print("\n" + "-" * 60 + "\n")
