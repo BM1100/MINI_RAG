@@ -1,21 +1,21 @@
-# Mini-RAG 🚀
+# Mini-RAG 
 
 A lightweight **Retrieval-Augmented Generation (RAG)** system that allows users to ask questions about documents and receive answers grounded in the retrieved content.
 
 The project demonstrates the core architecture behind modern RAG applications — from **document ingestion and chunking to semantic search and LLM-based answer generation**.
 
-## ✨ Features
+##  Features
 
-* 📄 Upload and process documents
-* ✂️ Split large documents into smaller chunks
-* 🧠 Generate semantic embeddings for document chunks
-* 🔎 Perform similarity-based vector search
-* 🤖 Generate context-aware answers using an LLM
-* 📚 Retrieve relevant document sections before generating responses
-* ⚡ Lightweight architecture suitable for experimentation and learning
-* 🔌 Modular ingestion and retrieval pipeline
+*  Upload and process documents
+* Split large documents into smaller chunks
+*  Generate semantic embeddings for document chunks
+*  Perform similarity-based vector search
+*  Generate context-aware answers using an LLM
+*  Retrieve relevant document sections before generating responses
+*  Lightweight architecture suitable for experimentation and learning
+*  Modular ingestion and retrieval pipeline
 
-## 🏗️ RAG Architecture
+##  RAG Architecture
 
 ```text
                 DOCUMENT INGESTION
@@ -72,7 +72,7 @@ USER QUERY ────────────┘
    FINAL ANSWER
 ```
 
-## 🔄 How It Works
+##  How It Works
 
 ### 1. Document Ingestion
 
@@ -108,7 +108,7 @@ The retrieved context is combined with the user's question and passed to the lan
 
 The LLM then generates an answer based on the retrieved information.
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 * **Python**
 * **LLM:** Google Gemini
@@ -117,7 +117,7 @@ The LLM then generates an answer based on the retrieved information.
 * **Document Processing:** PyPDF
 * **RAG Pipeline:** Custom Python implementation
 
-## 📁 Project Structure
+##  Project Structure
 
 ```text
 Mini-Rag/
@@ -133,7 +133,7 @@ Mini-Rag/
 
 > The exact file structure may vary depending on the current implementation.
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### 1. Clone the Repository
 
@@ -194,7 +194,7 @@ python retrieval.py
 
 You can then submit questions and retrieve answers based on the indexed documents.
 
-## 🧠 Why RAG?
+##  Why RAG?
 
 Traditional LLM applications rely primarily on knowledge encoded during model training. This can lead to problems when the required information is:
 
